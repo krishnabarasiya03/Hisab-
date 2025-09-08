@@ -5,9 +5,15 @@ A simple Excel-like calculator with spreadsheet functionality
 """
 
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 import re
 import math
+import csv
+import os
+import zipfile
+import webbrowser
+import urllib.parse
+from datetime import datetime
 
 class HisabApp:
     def __init__(self, root):
@@ -42,6 +48,7 @@ class HisabApp:
         
         ttk.Button(top_frame, text="Execute", command=self.execute_operation).pack(side=tk.LEFT)
         ttk.Button(top_frame, text="Clear All", command=self.clear_all).pack(side=tk.LEFT, padx=(5, 0))
+        ttk.Button(top_frame, text="Share via WhatsApp", command=self.share_via_whatsapp).pack(side=tk.LEFT, padx=(5, 0))
         
         # Main frame for the spreadsheet
         main_frame = ttk.Frame(self.root)
@@ -355,6 +362,164 @@ class HisabApp:
             self.set_cell_value(cell_key, "")
         self.cell_data.clear()
         self.operation_var.set("")
+    
+    def export_data_to_csv(self, filename):
+        """Export current spreadsheet data to CSV file"""
+        # Determine the actual data range (non-empty cells)
+        max_row = 0
+        max_col = 0
+        
+        for cell_key in self.cell_data:
+            if self.cell_data[cell_key]:  # Non-empty cell
+                # Parse cell key like "A1", "B5", etc.
+                col_letter = cell_key[0]
+                row_num = int(cell_key[1:])
+                col_num = ord(col_letter) - ord('A')
+                
+                max_row = max(max_row, row_num)
+                max_col = max(max_col, col_num)
+        
+        if max_row == 0 and max_col == 0:
+            # No data to export
+            return False
+        
+        # Create CSV data
+        with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            
+            # Write header row with column letters
+            header = [''] + [chr(65 + col) for col in range(max_col + 1)]
+            writer.writerow(header)
+            
+            # Write data rows
+            for row in range(1, max_row + 1):
+                row_data = [str(row)]  # Row number
+                for col in range(max_col + 1):
+                    col_letter = chr(65 + col)
+                    cell_key = f"{col_letter}{row}"
+                    value = self.cell_data.get(cell_key, "")
+                    row_data.append(str(value) if value else "")
+                writer.writerow(row_data)
+        
+        return True
+    
+    def create_share_zip(self):
+        """Create a zip file with the spreadsheet data"""
+        # Generate timestamp for unique filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        zip_filename = f"Hisab_Data_{timestamp}.zip"
+        csv_filename = f"Hisab_Spreadsheet_{timestamp}.csv"
+        
+        # Create temporary CSV file
+        temp_csv_path = os.path.join(os.path.dirname(__file__), csv_filename)
+        
+        # Export data to CSV
+        if not self.export_data_to_csv(temp_csv_path):
+            return None, "No data to export. Please enter some data in the spreadsheet first."
+        
+        # Create zip file
+        zip_path = os.path.join(os.path.dirname(__file__), zip_filename)
+        
+        try:
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                zipf.write(temp_csv_path, csv_filename)
+                
+                # Add a readme file with instructions
+                readme_content = f"""Hisab Spreadsheet Data
+====================
+
+This zip file contains your Hisab spreadsheet data exported on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.
+
+Files included:
+- {csv_filename}: Your spreadsheet data in CSV format
+
+To open the CSV file:
+- Use Microsoft Excel, Google Sheets, or any spreadsheet application
+- Import as CSV with comma separator
+
+About Hisab:
+Hisab is a simple Excel-like desktop calculator with spreadsheet functionality.
+Get Hisab at: https://github.com/krishnabarasiya03/Hisab-
+
+"""
+                zipf.writestr("README.txt", readme_content)
+            
+            # Clean up temporary CSV file
+            os.remove(temp_csv_path)
+            
+            return zip_path, None
+        
+        except Exception as e:
+            # Clean up on error
+            if os.path.exists(temp_csv_path):
+                os.remove(temp_csv_path)
+            return None, f"Error creating zip file: {str(e)}"
+    
+    def share_via_whatsapp(self):
+        """Share spreadsheet data via WhatsApp"""
+        try:
+            # Create zip file
+            zip_path, error = self.create_share_zip()
+            
+            if error:
+                messagebox.showwarning("No Data", error)
+                return
+            
+            if not zip_path:
+                messagebox.showerror("Error", "Failed to create share file")
+                return
+            
+            # Get file size for display
+            file_size = os.path.getsize(zip_path)
+            file_size_kb = file_size / 1024
+            
+            # Create WhatsApp message
+            message = f"📊 Sharing my Hisab spreadsheet data!\n\n" \
+                     f"File: {os.path.basename(zip_path)}\n" \
+                     f"Size: {file_size_kb:.1f} KB\n" \
+                     f"Created: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n" \
+                     f"Open the attached CSV file in any spreadsheet app.\n\n" \
+                     f"🧮 Get Hisab Calculator: https://github.com/krishnabarasiya03/Hisab-"
+            
+            # URL encode the message
+            encoded_message = urllib.parse.quote(message)
+            
+            # WhatsApp Web URL
+            whatsapp_url = f"https://web.whatsapp.com/send?text={encoded_message}"
+            
+            # Show success dialog with options
+            result = messagebox.askyesnocancel(
+                "Share via WhatsApp", 
+                f"✅ Zip file created successfully!\n\n"
+                f"File: {os.path.basename(zip_path)}\n"
+                f"Location: {zip_path}\n"
+                f"Size: {file_size_kb:.1f} KB\n\n"
+                f"Click 'Yes' to open WhatsApp Web\n"
+                f"Click 'No' to just keep the file\n"
+                f"Click 'Cancel' to delete the file"
+            )
+            
+            if result is True:  # Yes - Open WhatsApp
+                webbrowser.open(whatsapp_url)
+                messagebox.showinfo(
+                    "Next Steps", 
+                    "1. WhatsApp Web is opening in your browser\n"
+                    "2. Manually attach the zip file to your message\n"
+                    "3. The message text is pre-filled for you\n\n"
+                    f"Zip file location:\n{zip_path}"
+                )
+            elif result is False:  # No - Keep file
+                messagebox.showinfo(
+                    "File Saved", 
+                    f"Your spreadsheet data has been saved to:\n{zip_path}\n\n"
+                    f"You can manually share this file via any method."
+                )
+            else:  # Cancel - Delete file
+                os.remove(zip_path)
+                messagebox.showinfo("Cancelled", "Share cancelled and file deleted.")
+        
+        except Exception as e:
+            messagebox.showerror("Error", f"Error sharing via WhatsApp: {str(e)}")
 
 
 def main():
