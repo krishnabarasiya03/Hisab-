@@ -1,9 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import ContextMenu from './ContextMenu';
 import { performColumnOperation, performRowOperation } from '../utils/operations';
 
 const SpreadsheetGrid = ({ cellData, updateCell, clearColumn, clearRow }) => {
   const [contextMenu, setContextMenu] = useState(null);
+  const [selectedCell, setSelectedCell] = useState({ row: 0, col: 0 });
+  const cellRefs = useRef({});
   const ROWS = 20;
   const COLS = 10;
 
@@ -108,6 +110,88 @@ const SpreadsheetGrid = ({ cellData, updateCell, clearColumn, clearRow }) => {
     setContextMenu(null);
   }, []);
 
+  // Helper function to get cell key from row/col
+  const getCellKey = useCallback((row, col) => {
+    return `${String.fromCharCode(65 + col)}${row + 1}`;
+  }, []);
+
+  // Helper function to move selection and focus
+  const moveSelection = useCallback((newRow, newCol) => {
+    // Boundary checking
+    if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS) {
+      return;
+    }
+    
+    setSelectedCell({ row: newRow, col: newCol });
+    
+    // Focus the new cell
+    const cellKey = getCellKey(newRow, newCol);
+    const cellRef = cellRefs.current[cellKey];
+    if (cellRef) {
+      cellRef.focus();
+    }
+  }, [getCellKey]);
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback((e) => {
+    const { row, col } = selectedCell;
+    
+    switch (e.key) {
+      case 'ArrowUp':
+        e.preventDefault();
+        moveSelection(row - 1, col);
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        moveSelection(row + 1, col);
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        moveSelection(row, col - 1);
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        moveSelection(row, col + 1);
+        break;
+      case 'Tab':
+        e.preventDefault();
+        // Tab moves right, then down to next row
+        if (col < COLS - 1) {
+          moveSelection(row, col + 1);
+        } else if (row < ROWS - 1) {
+          moveSelection(row + 1, 0);
+        }
+        break;
+      case 'Enter':
+        e.preventDefault();
+        // Enter moves down
+        moveSelection(row + 1, col);
+        break;
+      default:
+        break;
+    }
+  }, [selectedCell, moveSelection]);
+
+  // Add keyboard event listener
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      // Only handle navigation if focus is on a cell input
+      if (e.target && e.target.tagName === 'INPUT' && e.target.closest('.grid-cell')) {
+        handleKeyDown(e);
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  // Handle cell click to update selected cell
+  const handleCellClick = useCallback((row, col) => {
+    setSelectedCell({ row, col });
+  }, []);
+
   // Generate grid rows
   const gridRows = [];
   
@@ -146,12 +230,20 @@ const SpreadsheetGrid = ({ cellData, updateCell, clearColumn, clearRow }) => {
     // Data cells
     for (let col = 0; col < COLS; col++) {
       const cellKey = `${String.fromCharCode(65 + col)}${row + 1}`;
+      const isSelected = selectedCell.row === row && selectedCell.col === col;
       cells.push(
-        <div key={cellKey} className="grid-cell">
+        <div key={cellKey} className={`grid-cell ${isSelected ? 'selected' : ''}`}>
           <input
+            ref={(el) => {
+              if (el) {
+                cellRefs.current[cellKey] = el;
+              }
+            }}
             type="text"
             value={getCellValue(cellKey)}
             onChange={(e) => handleCellChange(cellKey, e.target.value)}
+            onClick={() => handleCellClick(row, col)}
+            onFocus={() => handleCellClick(row, col)}
           />
         </div>
       );
