@@ -4,31 +4,71 @@ const isDev = require('electron-is-dev');
 
 let mainWindow;
 
+// Error handling for unhandled exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  // Don't exit in production, just log the error
+  if (isDev) {
+    process.exit(1);
+  }
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // Don't exit in production, just log the error
+});
+
 function createWindow() {
   // Create the browser window
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 700,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableRemoteModule: false,
+      preload: path.join(__dirname, 'preload.js')
     },
-    icon: path.join(__dirname, 'assets/icon.png'), // We'll add this later
-    title: 'Hisab Calculator'
+    // Conditionally set icon only if it exists to prevent startup errors
+    ...((() => {
+      const fs = require('fs');
+      const iconPath = process.platform === 'win32' 
+        ? path.join(__dirname, 'assets/icon.ico')
+        : process.platform === 'darwin'
+        ? path.join(__dirname, 'assets/icon.icns')
+        : path.join(__dirname, 'assets/icon.png');
+      
+      return fs.existsSync(iconPath) ? { icon: iconPath } : {};
+    })()),
+    title: 'Hisab Calculator',
+    show: false, // Don't show until ready
+    webSecurity: true
   });
 
   // Load the app
   const startUrl = isDev 
     ? 'http://localhost:3000' 
-    : `file://${path.join(__dirname, '../build/index.html')}`;
+    : `file://${path.join(__dirname, 'build/index.html')}`;
   
-  mainWindow.loadURL(startUrl);
+  mainWindow.loadURL(startUrl).catch((error) => {
+    console.error('Failed to load URL:', error);
+    // Try loading a fallback error page or show error dialog
+    const { dialog } = require('electron');
+    dialog.showErrorBox(
+      'Loading Error', 
+      `Failed to load the application.\n\nError: ${error.message}\n\nPlease check that the app was built correctly by running: npm run build`
+    );
+  });
 
-  // Open DevTools in development
-  if (isDev) {
-    mainWindow.webContents.openDevTools();
-  }
+  // Show window when ready to prevent white screen flash
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    
+    // Open DevTools in development
+    if (isDev) {
+      mainWindow.webContents.openDevTools();
+    }
+  });
 
   // Handle window closed
   mainWindow.on('closed', () => {
@@ -133,7 +173,14 @@ function createMenu() {
 }
 
 // App event handlers
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+  
+  // Set app user model ID for Windows notifications
+  if (process.platform === 'win32') {
+    app.setAppUserModelId('com.krishnabarasiya.hisab');
+  }
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -147,10 +194,32 @@ app.on('activate', () => {
   }
 });
 
-// Security: Prevent new window creation
+// Handle protocol for Windows deep linking
+if (process.platform === 'win32') {
+  app.setAsDefaultProtocolClient('hisab');
+}
+
+// Improve app quit behavior on Windows
+app.on('before-quit', (event) => {
+  // Allow graceful shutdown
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.close();
+  }
+});
+
+// Security: Prevent new window creation and handle external links safely
 app.on('web-contents-created', (event, contents) => {
-  contents.on('new-window', (navigationEvent, url) => {
-    navigationEvent.preventDefault();
+  contents.setWindowOpenHandler(({ url }) => {
+    // Open external links in default browser
     shell.openExternal(url);
+    return { action: 'deny' };
+  });
+  
+  // Prevent navigation to external URLs
+  contents.on('will-navigate', (event, url) => {
+    if (url !== contents.getURL()) {
+      event.preventDefault();
+      shell.openExternal(url);
+    }
   });
 });
