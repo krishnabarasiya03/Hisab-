@@ -1,25 +1,58 @@
 # Hisab - Desktop Calculator Application
 
-A simple Excel-like desktop calculator application with spreadsheet functionality.
+A modern Excel-like desktop calculator application with spreadsheet functionality, built with **JavaScript, React, and Electron**.
 
 ## 🚀 Quick Start
 
-### 1. Download & Run (Easiest Method)
+### JavaScript/React/Electron Version (Recommended)
+
 ```bash
-# Linux/macOS - Make executable and run
+# Prerequisites: Node.js 16+ and npm
+# Install from https://nodejs.org/
+
+# 1. Install dependencies
+npm install
+
+# 2. Build the React app
+npm run build
+
+# 3. Start the Electron application
+npm start
+
+# OR use the launcher scripts:
+# Linux/macOS
 chmod +x run_hisab.sh
 ./run_hisab.sh
 
-# Windows - Double-click or run in Command Prompt
+# Windows
 run_hisab.bat
+```
 
-# Or run directly with Python (all platforms)
+### Development Mode
+```bash
+# Start React dev server + Electron with hot reloading
+npm run dev
+
+# Or start just the React dev server
+npm run dev-react
+```
+
+### Create Distribution Packages
+```bash
+# Create platform-specific installers (.exe, .dmg, .AppImage)
+npm run dist
+```
+
+### Legacy Python Version
+The original Python/tkinter version is still available:
+```bash
+# Make sure Python 3.6+ with tkinter is installed
 python3 hisab_app.py
 ```
 
 ### 2. Auto-Setup Desktop Integration (Recommended)
 ```bash
-# Run the automated setup script
+# Run the automated setup script (detects version automatically)
 python3 setup_desktop.py
 ```
 This will automatically create desktop shortcuts and add Hisab to your applications menu.
@@ -31,6 +64,20 @@ See the [Desktop Integration](#desktop-integration) section below for platform-s
 - Click any cell and enter numbers
 - Use the operation field to enter formulas like `A*B` 
 - Right-click on row/column headers for quick operations
+
+## Technology Stack
+
+### Modern JavaScript Version
+- **Frontend**: React.js with modern hooks and components
+- **Desktop**: Electron.js for cross-platform native applications
+- **Build System**: webpack (via create-react-app) and npm scripts
+- **Packaging**: electron-builder for creating installers
+- **Styling**: Modern CSS with responsive design
+
+### Legacy Python Version  
+- **GUI**: tkinter (Python standard library)
+- **Logic**: Pure Python with mathematical operations
+- **Cross-platform**: Works on Windows, macOS, and Linux
 
 ## Features
 
@@ -59,7 +106,46 @@ See the [Desktop Integration](#desktop-integration) section below for platform-s
 
 ## Installation
 
-### Prerequisites
+### JavaScript/React/Electron Version (Recommended)
+
+#### Prerequisites
+- Node.js 16 or higher
+- npm (comes with Node.js)
+
+#### Download Node.js
+- **All Platforms**: [nodejs.org](https://nodejs.org/) - Download LTS version
+- **Windows**: Download installer and check "Add to PATH"
+- **macOS**: `brew install node` or download from nodejs.org
+- **Linux**: 
+  ```bash
+  # Ubuntu/Debian
+  curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+  sudo apt-get install -y nodejs
+  
+  # CentOS/RHEL
+  curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash -
+  sudo yum install -y nodejs
+  ```
+
+#### Install and Run
+```bash
+# Clone or download the repository
+git clone https://github.com/krishnabarasiya03/Hisab-.git
+cd Hisab-
+
+# Install dependencies
+npm install
+
+# Build the React application
+npm run build
+
+# Start the Electron app
+npm start
+```
+
+### Legacy Python Version
+
+#### Prerequisites
 - Python 3.6 or higher
 - tkinter (usually included with Python)
 
@@ -170,6 +256,21 @@ Copy the .app file to the Applications folder to make it available in Launchpad.
 ## Usage
 
 ### Starting the Application
+
+#### JavaScript/React/Electron Version
+```bash
+# Production mode
+npm start
+
+# Development mode (with hot reloading)
+npm run dev
+
+# Using launcher scripts
+./run_hisab.sh        # Linux/macOS
+run_hisab.bat         # Windows
+```
+
+#### Legacy Python Version
 ```bash
 # Make the launcher executable (Linux/macOS)
 chmod +x run_hisab.sh
@@ -203,7 +304,38 @@ python3 hisab_app.py
 
 ### Common Issues and Solutions
 
-#### "Python 3 is not installed" Error
+#### JavaScript/React/Electron Version
+
+##### "Node.js is not installed" Error
+- **All Platforms:** Download and install Node.js from [nodejs.org](https://nodejs.org). Choose the LTS version.
+- **Windows:** Make sure to check "Add to PATH" during installation
+- **Linux:** Use your package manager or NodeSource repository
+- **macOS:** Install from nodejs.org or use Homebrew: `brew install node`
+
+##### "npm command not found" Error
+- npm comes with Node.js. If it's missing, reinstall Node.js
+- On Linux, you might need to install npm separately: `sudo apt install npm`
+
+##### Application Doesn't Start
+1. Make sure all dependencies are installed: `npm install`
+2. Build the React app: `npm run build`
+3. Check for error messages in the terminal
+4. Try development mode: `npm run dev`
+
+##### Build Fails
+1. Clear npm cache: `npm cache clean --force`
+2. Delete node_modules and reinstall: `rm -rf node_modules && npm install`
+3. Make sure you have enough disk space
+4. Check Node.js version: `node --version` (should be 16+)
+
+##### Electron App Shows Blank Screen
+1. Make sure React app is built: `npm run build`
+2. Check browser console for errors (Ctrl+Shift+I)
+3. Try starting with development mode: `npm run dev`
+
+#### Legacy Python Version
+
+##### "Python 3 is not installed" Error
 - **Windows:** Download and install Python from [python.org](https://python.org). Make sure to check "Add Python to PATH" during installation.
 - **Linux:** `sudo apt install python3` (Ubuntu/Debian) or `sudo yum install python3` (CentOS/RHEL)
 - **macOS:** Install from [python.org](https://python.org) or use Homebrew: `brew install python3`
@@ -237,6 +369,19 @@ chmod +x run_hisab.sh
 
 ### Getting Help
 If you encounter issues not covered here:
+
+#### For JavaScript/React/Electron Version:
+1. Check the terminal/command prompt for error messages
+2. Verify your Node.js installation: `node --version && npm --version`
+3. Try clearing cache and reinstalling: `npm cache clean --force && rm -rf node_modules && npm install`
+4. Open an issue on the GitHub repository with:
+   - Your operating system and version
+   - Node.js version (`node --version`)
+   - npm version (`npm --version`)
+   - Complete error message
+   - Steps you tried to fix it
+
+#### For Legacy Python Version:
 1. Check the terminal/command prompt for error messages
 2. Verify your Python installation: `python3 -c "import tkinter; print('OK')"`
 3. Open an issue on the GitHub repository with:
@@ -247,13 +392,27 @@ If you encounter issues not covered here:
 
 ## Files
 
-- `hisab_app.py` - Main application file
+### JavaScript/React/Electron Version
+- `package.json` - npm project configuration and dependencies
+- `main.js` - Electron main process (desktop app)
+- `src/App.js` - Main React application component
+- `src/components/` - React UI components (SpreadsheetGrid, OperationBar, ContextMenu)
+- `src/utils/` - Business logic (calculator.js, operations.js)
+- `public/index.html` - HTML template for React app
+- `src/App.css` - Modern styling and responsive design
 - `run_hisab.sh` - Launcher script (Linux/macOS)
 - `run_hisab.bat` - Launcher script (Windows)
-- `setup_desktop.py` - Automated desktop integration setup
-- `requirements.txt` - Documentation of requirements
+- `test-standalone.js` - Core functionality tests for Node.js
+- `demo.js` - Feature demonstration script
+
+### Legacy Python Version
+- `hisab_app.py` - Main Python/tkinter application file
 - `test_hisab.py` - Test suite for core functionality
 - `demo.py` - Feature demonstration script
+
+### Shared Files
+- `setup_desktop.py` - Automated desktop integration setup (supports both versions)
+- `requirements.txt` - Documentation of Python requirements (legacy)
 - `README.md` - This documentation
 
 ## License

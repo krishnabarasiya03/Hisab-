@@ -1,26 +1,46 @@
 #!/bin/bash
-# Hisab Desktop Application Launcher
 
-echo "Starting Hisab Desktop Application..."
+# Hisab Calculator - Linux/macOS Launcher Script
+# Builds and runs the Electron application
 
-# Check if Python 3 is installed
-if ! command -v python3 &> /dev/null; then
-    echo "Error: Python 3 is not installed!"
-    echo "Please install Python 3 from https://python.org"
+echo "🧮 Starting Hisab Calculator..."
+
+# Check if Node.js is installed
+if ! command -v node &> /dev/null; then
+    echo "❌ Node.js is not installed. Please install Node.js from https://nodejs.org/"
     exit 1
 fi
 
-# Check if tkinter is available
-python3 -c "import tkinter" 2>/dev/null
+# Check if npm is installed
+if ! command -v npm &> /dev/null; then
+    echo "❌ npm is not installed. Please install npm"
+    exit 1
+fi
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+echo "📦 Checking dependencies..."
+
+# Check if node_modules exists
+if [ ! -d "node_modules" ]; then
+    echo "📥 Installing dependencies..."
+    npm install
+    if [ $? -ne 0 ]; then
+        echo "❌ Failed to install dependencies"
+        exit 1
+    fi
+fi
+
+echo "🔨 Building React app..."
+npm run build
 if [ $? -ne 0 ]; then
-    echo "Error: tkinter is not available!"
-    echo "Please install tkinter:"
-    echo "  Ubuntu/Debian: sudo apt install python3-tk"
-    echo "  CentOS/RHEL: sudo yum install tkinter"
-    echo "  macOS: tkinter should be included with Python"
-    echo "  Windows: tkinter should be included with Python"
+    echo "❌ Failed to build React app"
     exit 1
 fi
 
-# Run the application
-python3 hisab_app.py
+echo "🚀 Starting Hisab Calculator..."
+npm start
+
+echo "✅ Hisab Calculator closed successfully"
