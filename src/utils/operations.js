@@ -1,6 +1,6 @@
 // Utility functions for row and column operations
 
-import { getCellValue } from './calculator';
+import { getCellValue } from './calculator.js';
 
 export const performColumnOperation = (col, operation, value, cellData, maxRows) => {
   const colLetter = String.fromCharCode(65 + col);

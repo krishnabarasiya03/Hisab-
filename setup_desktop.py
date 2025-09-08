@@ -2,7 +2,7 @@
 """
 Desktop Setup Script for Hisab Calculator
 Automatically creates desktop shortcuts and application menu entries
-Supports both Python/tkinter and JavaScript/React/Electron versions
+JavaScript/React/Electron version only
 """
 
 import os
@@ -19,29 +19,20 @@ def detect_version():
     """Detect which version of Hisab is available"""
     script_dir = get_script_dir()
     
-    has_python = (script_dir / "hisab_app.py").exists()
     has_js = (script_dir / "package.json").exists()
     
     if has_js:
         return "javascript"
-    elif has_python:
-        return "python"
     else:
         return "unknown"
 
 def create_linux_desktop_entry():
     """Create desktop entry for Linux systems"""
     script_dir = get_script_dir()
-    version = detect_version()
     
-    if version == "javascript":
-        launcher_path = script_dir / "run_hisab.sh"
-        comment = "Excel-like desktop calculator with React and Electron"
-        categories = "Office;Calculator;Development;"
-    else:
-        launcher_path = script_dir / "run_hisab.sh"
-        comment = "Excel-like desktop calculator with spreadsheet functionality"
-        categories = "Office;Calculator;"
+    launcher_path = script_dir / "run_hisab.sh"
+    comment = "Excel-like desktop calculator with React and Electron"
+    categories = "Office;Calculator;Development;"
     
     # Make sure the launcher script is executable
     os.chmod(launcher_path, 0o755)
@@ -173,12 +164,8 @@ def main():
     print("Setup complete! You can now:")
     print("• Find Hisab Calculator in your applications menu")
     print("• Use desktop shortcuts (if created)")
-    
-    if version == "javascript":
-        print("• Run directly: npm start (after npm install && npm run build)")
-        print("• Development mode: npm run dev")
-    else:
-        print("• Run directly: python3 hisab_app.py")
+    print("• Run directly: npm start (after npm install && npm run build)")
+    print("• Development mode: npm run dev")
     
     print("\nFor troubleshooting, see README.md")
 
