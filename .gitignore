@@ -38,3 +38,7 @@ Thumbs.db
 
 # Application specific
 *.log
+
+# WhatsApp share temporary files
+Hisab_Data_*.zip
+Hisab_Spreadsheet_*.csv

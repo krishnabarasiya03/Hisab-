@@ -57,6 +57,15 @@ See the [Desktop Integration](#desktop-integration) section below for platform-s
   - Multiply/Add/Subtract/Divide: Apply operation to all cells in row
   - Clear Row: Remove all values from the row
 
+### 📱 WhatsApp Share Feature
+- **Share via WhatsApp**: Click the "Share via WhatsApp" button to export and share your data
+  - Exports current spreadsheet data to CSV format
+  - Creates a zip file with your data and helpful README
+  - Opens WhatsApp Web with pre-filled message
+  - Perfect for sharing budgets, calculations, or reports with family and friends
+  - Files include timestamps to avoid conflicts
+  - No external dependencies - uses Python standard library only
+
 ## Installation
 
 ### Prerequisites
@@ -199,6 +208,23 @@ python3 hisab_app.py
 4. Results appear in column C: `5, 12, 21, 32`
 5. Right-click on column C header and select "Sum Column" to get total
 
+### 📱 WhatsApp Sharing Workflow
+
+1. **Prepare Your Data**: Enter your calculations, budgets, or any data in the spreadsheet
+2. **Click Share Button**: Click the "Share via WhatsApp" button in the top toolbar
+3. **Choose Action**: Select from the dialog options:
+   - **Yes**: Opens WhatsApp Web with pre-filled message
+   - **No**: Saves the zip file for manual sharing
+   - **Cancel**: Deletes the file and cancels sharing
+4. **Share the File**: In WhatsApp, manually attach the generated zip file and send
+5. **Recipients Open**: Recipients can open the CSV file in Excel, Google Sheets, or any spreadsheet app
+
+**What gets shared:**
+- Your spreadsheet data in professional CSV format
+- A helpful README.txt with opening instructions
+- Timestamped filename (e.g., `Hisab_Data_20240908_143052.zip`)
+- Pre-written message promoting the Hisab calculator
+
 ## 🔧 Troubleshooting
 
 ### Common Issues and Solutions
@@ -253,7 +279,10 @@ If you encounter issues not covered here:
 - `setup_desktop.py` - Automated desktop integration setup
 - `requirements.txt` - Documentation of requirements
 - `test_hisab.py` - Test suite for core functionality
+- `test_whatsapp_share.py` - Tests for WhatsApp share functionality
+- `test_e2e_share.py` - End-to-end test for sharing workflow
 - `demo.py` - Feature demonstration script
+- `demo_whatsapp_share.py` - Demo for new WhatsApp share feature
 - `README.md` - This documentation
 
 ## License
