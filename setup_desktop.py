@@ -29,6 +29,7 @@ def detect_version():
 def create_linux_desktop_entry():
     """Create desktop entry for Linux systems"""
     script_dir = get_script_dir()
+    version = detect_version()
     
     launcher_path = script_dir / "run_hisab.sh"
     comment = "Excel-like desktop calculator with React and Electron"
@@ -79,24 +80,55 @@ StartupNotify=true
 def create_windows_shortcuts():
     """Create shortcuts for Windows"""
     version = detect_version()
+    script_dir = get_script_dir()
     
     print(f"\n🪟 Windows Setup Instructions ({version} version):")
-    print("To create desktop shortcuts on Windows:")
+    print("Multiple ways to set up Hisab Calculator on Windows:")
+    
+    print("\n📋 Option 1: Desktop Shortcut (Recommended)")
     print("1. Right-click on 'run_hisab.bat' in the file explorer")
     print("2. Select 'Send to' → 'Desktop (create shortcut)'")
     print("3. Rename the shortcut to 'Hisab Calculator'")
-    print("\nTo add to Start Menu:")
-    print("1. Copy the desktop shortcut")
-    print("2. Paste it in: %APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\")
+    print("4. (Optional) Right-click the shortcut → Properties → Change Icon")
+    
+    print("\n📋 Option 2: Start Menu Shortcut")
+    print("1. Create desktop shortcut as above")
+    print("2. Copy the desktop shortcut")
+    print("3. Open: %APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\")
+    print("4. Paste the shortcut there")
+    
+    print("\n📋 Option 3: Taskbar Pin")
+    print("1. Run the application once using run_hisab.bat")
+    print("2. Right-click the Hisab Calculator icon in the taskbar")
+    print("3. Select 'Pin to taskbar'")
+    
+    print("\n📋 Option 4: Windows App (Advanced)")
+    print("Create a Windows installer package:")
+    print("1. Install dependencies: npm install")
+    print("2. Build the app: npm run build")
+    print("3. Create installer: npm run dist")
+    print("4. Find installer in 'dist' folder")
     
     if version == "javascript":
-        print("\nFor JavaScript/Electron version:")
-        print("- Requires Node.js 16+ to be installed")
-        print("- First run will install dependencies automatically")
-        print("- You can also use: npm run dist to create installer packages")
+        print("\n💻 System Requirements:")
+        print("- Windows 7/8.1/10/11 (32-bit or 64-bit)")
+        print("- Node.js 16+ (download from https://nodejs.org)")
+        print("- At least 100MB free disk space")
+        print("- Internet connection for initial setup")
+        
+        print("\n🔧 Troubleshooting:")
+        print("- If you get 'Node.js not found': Restart command prompt after installing Node.js")
+        print("- If build fails: Try 'npm cache clean --force' then 'npm install'")
+        print("- If app won't start: Run 'npm run build' first")
+        print("- For permission errors: Run command prompt as Administrator")
     else:
-        print("\nFor Python version:")
+        print("\n💻 For Python version:")
         print("- Requires Python 3.6+ with tkinter")
+        print("- No additional Windows-specific setup needed")
+    
+    print(f"\n🚀 To run directly: double-click 'run_hisab.bat'")
+    print(f"📁 Application location: {script_dir}")
+    print("\n💡 Tip: Pin the shortcut to your taskbar for quick access!")
     
     print("\nAlternatively, double-click 'run_hisab.bat' to run the application.")
 

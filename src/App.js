@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import './App.css';
 import SpreadsheetGrid from './components/SpreadsheetGrid';
 import OperationBar from './components/OperationBar';
@@ -38,6 +38,20 @@ function App() {
     setCellData({});
     setOperation('');
   }, []);
+
+  // Listen for clear-all command from Electron main process
+  useEffect(() => {
+    const handleClearAll = () => {
+      clearAll();
+    };
+
+    // Listen for the custom event from preload script
+    window.addEventListener('clear-all', handleClearAll);
+    
+    return () => {
+      window.removeEventListener('clear-all', handleClearAll);
+    };
+  }, [clearAll]);
 
   const clearColumn = useCallback((col) => {
     const colLetter = String.fromCharCode(65 + col);
