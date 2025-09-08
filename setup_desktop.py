@@ -29,6 +29,7 @@ def detect_version():
 def create_linux_desktop_entry():
     """Create desktop entry for Linux systems"""
     script_dir = get_script_dir()
+    version = detect_version()
     
     launcher_path = script_dir / "run_hisab.sh"
     comment = "Excel-like desktop calculator with React and Electron"
