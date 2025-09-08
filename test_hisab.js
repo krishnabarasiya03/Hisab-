@@ -1,8 +1,8 @@
 // Test script for Hisab Calculator - JavaScript/React version
 // Tests core functionality
 
-import { getCellValue, parseFormula, executeFormula } from '../src/utils/calculator.js';
-import { performColumnOperation, performRowOperation } from '../src/utils/operations.js';
+import { getCellValue, parseFormula, executeFormula } from './src/utils/calculator.js';
+import { performColumnOperation, performRowOperation } from './src/utils/operations.js';
 
 // Mock data for testing
 const testCellData = {
@@ -180,7 +180,7 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // Run tests if this file is executed directly
-if (typeof require !== 'undefined' && require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const success = main();
   process.exit(success ? 0 : 1);
 }
