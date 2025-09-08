@@ -43,16 +43,9 @@ npm run dev-react
 npm run dist
 ```
 
-### Legacy Python Version
-The original Python/tkinter version is still available:
-```bash
-# Make sure Python 3.6+ with tkinter is installed
-python3 hisab_app.py
-```
-
 ### 2. Auto-Setup Desktop Integration (Recommended)
 ```bash
-# Run the automated setup script (detects version automatically)
+# Run the automated setup script
 python3 setup_desktop.py
 ```
 This will automatically create desktop shortcuts and add Hisab to your applications menu.
@@ -67,17 +60,12 @@ See the [Desktop Integration](#desktop-integration) section below for platform-s
 
 ## Technology Stack
 
-### Modern JavaScript Version
+**Modern JavaScript/React/Electron Implementation**:
 - **Frontend**: React.js with modern hooks and components
 - **Desktop**: Electron.js for cross-platform native applications
 - **Build System**: webpack (via create-react-app) and npm scripts
 - **Packaging**: electron-builder for creating installers
 - **Styling**: Modern CSS with responsive design
-
-### Legacy Python Version  
-- **GUI**: tkinter (Python standard library)
-- **Logic**: Pure Python with mathematical operations
-- **Cross-platform**: Works on Windows, macOS, and Linux
 
 ## Features
 
@@ -143,32 +131,27 @@ npm run build
 npm start
 ```
 
-### Legacy Python Version
-
-#### Prerequisites
-- Python 3.6 or higher
-- tkinter (usually included with Python)
-
 ### Linux (Ubuntu/Debian)
 ```bash
 sudo apt update
-sudo apt install python3 python3-tk
+sudo apt install nodejs npm
 ```
 
 ### Linux (CentOS/RHEL)
 ```bash
-sudo yum install python3 tkinter
+sudo yum install nodejs npm
 ```
 
 ### macOS
 ```bash
-# tkinter is included with Python from python.org
-# If using Homebrew:
-brew install python-tk
+# Using Homebrew:
+brew install node
+
+# Or download from nodejs.org
 ```
 
 ### Windows
-tkinter is included with the standard Python installation from python.org
+Download and install Node.js from [nodejs.org](https://nodejs.org), making sure to check "Add to PATH" option.
 
 ## 🖥️ Desktop Integration
 
@@ -194,12 +177,6 @@ If you prefer to set up desktop integration manually, follow the platform-specif
    - Right-click on `run_hisab.bat`
    - Select "Send to" → "Desktop (create shortcut)"
    - Rename the shortcut to "Hisab Calculator"
-
-2. **Creating a Python Shortcut:**
-   - Right-click on desktop → "New" → "Shortcut"
-   - Enter path: `python "C:\path\to\Hisab-\hisab_app.py"`
-   - Click "Next" and name it "Hisab Calculator"
-   - Right-click the shortcut → "Properties" → Change icon if desired
 
 #### Linux (Ubuntu/Debian/GNOME)
 1. **Create a .desktop file:**
@@ -270,16 +247,6 @@ npm run dev
 run_hisab.bat         # Windows
 ```
 
-#### Legacy Python Version
-```bash
-# Make the launcher executable (Linux/macOS)
-chmod +x run_hisab.sh
-./run_hisab.sh
-
-# Or run directly with Python
-python3 hisab_app.py
-```
-
 ### Basic Operations
 
 1. **Enter Data**: Click on any cell and type a number
@@ -333,66 +300,28 @@ python3 hisab_app.py
 2. Check browser console for errors (Ctrl+Shift+I)
 3. Try starting with development mode: `npm run dev`
 
-#### Legacy Python Version
-
-##### "Python 3 is not installed" Error
-- **Windows:** Download and install Python from [python.org](https://python.org). Make sure to check "Add Python to PATH" during installation.
-- **Linux:** `sudo apt install python3` (Ubuntu/Debian) or `sudo yum install python3` (CentOS/RHEL)
-- **macOS:** Install from [python.org](https://python.org) or use Homebrew: `brew install python3`
-
-#### "tkinter is not available" Error
-- **Linux:** `sudo apt install python3-tk` (Ubuntu/Debian) or `sudo yum install tkinter` (CentOS/RHEL)
-- **Windows/macOS:** tkinter should be included with Python. If missing, reinstall Python from [python.org](https://python.org)
-
 #### "Permission denied" Error (Linux/macOS)
 Make the script executable:
 ```bash
 chmod +x run_hisab.sh
 ```
 
-#### Application Window Doesn't Appear
-1. Check if Python and tkinter are properly installed
-2. Try running directly: `python3 hisab_app.py`
-3. Check for error messages in the terminal
-4. Ensure you're not running over SSH without X11 forwarding
-
-#### Desktop Shortcut Doesn't Work
-1. Verify the path in the shortcut is correct
-2. Make sure Python is in your system PATH
-3. Try running the batch/shell script directly first
-4. On Linux, ensure the .desktop file has execute permissions
-
-#### Application Runs But Crashes
-1. Check Python version: `python3 --version` (requires 3.6+)
-2. Look for error messages in the terminal
-3. Try running the test file: `python3 test_hisab.py`
-
 ### Getting Help
 If you encounter issues not covered here:
 
-#### For JavaScript/React/Electron Version:
 1. Check the terminal/command prompt for error messages
 2. Verify your Node.js installation: `node --version && npm --version`
 3. Try clearing cache and reinstalling: `npm cache clean --force && rm -rf node_modules && npm install`
 4. Open an issue on the GitHub repository with:
+   - Your operating system and version
    - Your operating system and version
    - Node.js version (`node --version`)
    - npm version (`npm --version`)
    - Complete error message
    - Steps you tried to fix it
 
-#### For Legacy Python Version:
-1. Check the terminal/command prompt for error messages
-2. Verify your Python installation: `python3 -c "import tkinter; print('OK')"`
-3. Open an issue on the GitHub repository with:
-   - Your operating system and version
-   - Python version (`python3 --version`)
-   - Complete error message
-   - Steps you tried to fix it
-
 ## Files
 
-### JavaScript/React/Electron Version
 - `package.json` - npm project configuration and dependencies
 - `main.js` - Electron main process (desktop app)
 - `src/App.js` - Main React application component
@@ -402,17 +331,9 @@ If you encounter issues not covered here:
 - `src/App.css` - Modern styling and responsive design
 - `run_hisab.sh` - Launcher script (Linux/macOS)
 - `run_hisab.bat` - Launcher script (Windows)
-- `test-standalone.js` - Core functionality tests for Node.js
+- `test_hisab.js` - Core functionality tests for Node.js
 - `demo.js` - Feature demonstration script
-
-### Legacy Python Version
-- `hisab_app.py` - Main Python/tkinter application file
-- `test_hisab.py` - Test suite for core functionality
-- `demo.py` - Feature demonstration script
-
-### Shared Files
-- `setup_desktop.py` - Automated desktop integration setup (supports both versions)
-- `requirements.txt` - Documentation of Python requirements (legacy)
+- `setup_desktop.py` - Automated desktop integration setup
 - `README.md` - This documentation
 
 ## License
