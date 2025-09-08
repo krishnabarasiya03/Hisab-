@@ -143,6 +143,17 @@
   background-color: #ebf3fd;
 }
 
+.grid-cell.selected {
+  background-color: #3498db;
+  border: 2px solid #2980b9;
+}
+
+.grid-cell.selected input {
+  background-color: #ebf3fd;
+  border: none;
+  outline: none;
+}
+
 .row-header {
   min-width: 40px;
   background-color: #ecf0f1;
