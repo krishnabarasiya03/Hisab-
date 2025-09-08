@@ -2,6 +2,7 @@
 """
 Desktop Setup Script for Hisab Calculator
 Automatically creates desktop shortcuts and application menu entries
+Supports both Python/tkinter and JavaScript/React/Electron versions
 """
 
 import os
@@ -14,10 +15,33 @@ def get_script_dir():
     """Get the directory where this script is located"""
     return Path(__file__).parent.absolute()
 
+def detect_version():
+    """Detect which version of Hisab is available"""
+    script_dir = get_script_dir()
+    
+    has_python = (script_dir / "hisab_app.py").exists()
+    has_js = (script_dir / "package.json").exists()
+    
+    if has_js:
+        return "javascript"
+    elif has_python:
+        return "python"
+    else:
+        return "unknown"
+
 def create_linux_desktop_entry():
     """Create desktop entry for Linux systems"""
     script_dir = get_script_dir()
-    launcher_path = script_dir / "run_hisab.sh"
+    version = detect_version()
+    
+    if version == "javascript":
+        launcher_path = script_dir / "run_hisab.sh"
+        comment = "Excel-like desktop calculator with React and Electron"
+        categories = "Office;Calculator;Development;"
+    else:
+        launcher_path = script_dir / "run_hisab.sh"
+        comment = "Excel-like desktop calculator with spreadsheet functionality"
+        categories = "Office;Calculator;"
     
     # Make sure the launcher script is executable
     os.chmod(launcher_path, 0o755)
@@ -26,11 +50,11 @@ def create_linux_desktop_entry():
 Version=1.0
 Type=Application
 Name=Hisab Calculator
-Comment=Excel-like desktop calculator with spreadsheet functionality
+Comment={comment}
 Exec={launcher_path}
 Icon=calc
 Terminal=false
-Categories=Office;Calculator;
+Categories={categories}
 StartupNotify=true
 """
     
@@ -55,7 +79,7 @@ StartupNotify=true
         os.chmod(desktop_shortcut, 0o755)
         print(f"✓ Created desktop shortcut: {desktop_shortcut}")
     
-    print("\n📋 Linux Setup Complete!")
+    print(f"\n📋 Linux Setup Complete! ({version} version)")
     print("- Hisab Calculator is now available in your applications menu under 'Office'")
     if desktop_dir.exists():
         print("- Desktop shortcut created")
@@ -63,7 +87,9 @@ StartupNotify=true
 
 def create_windows_shortcuts():
     """Create shortcuts for Windows"""
-    print("\n🪟 Windows Setup Instructions:")
+    version = detect_version()
+    
+    print(f"\n🪟 Windows Setup Instructions ({version} version):")
     print("To create desktop shortcuts on Windows:")
     print("1. Right-click on 'run_hisab.bat' in the file explorer")
     print("2. Select 'Send to' → 'Desktop (create shortcut)'")
@@ -71,17 +97,28 @@ def create_windows_shortcuts():
     print("\nTo add to Start Menu:")
     print("1. Copy the desktop shortcut")
     print("2. Paste it in: %APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\")
+    
+    if version == "javascript":
+        print("\nFor JavaScript/Electron version:")
+        print("- Requires Node.js 16+ to be installed")
+        print("- First run will install dependencies automatically")
+        print("- You can also use: npm run dist to create installer packages")
+    else:
+        print("\nFor Python version:")
+        print("- Requires Python 3.6+ with tkinter")
+    
     print("\nAlternatively, double-click 'run_hisab.bat' to run the application.")
 
 def create_macos_instructions():
     """Provide instructions for macOS"""
     script_dir = get_script_dir()
     launcher_path = script_dir / "run_hisab.sh"
+    version = detect_version()
     
     # Make sure the launcher script is executable
     os.chmod(launcher_path, 0o755)
     
-    print("\n🍎 macOS Setup Instructions:")
+    print(f"\n🍎 macOS Setup Instructions ({version} version):")
     print("To create an application bundle:")
     print("1. Open Automator")
     print("2. Choose 'Application'")
@@ -90,11 +127,28 @@ def create_macos_instructions():
     print("5. Save as 'Hisab Calculator.app' in Applications folder")
     print("\nTo create desktop alias:")
     print("1. Drag the app from Applications to Desktop while holding ⌥+⌘")
+    
+    if version == "javascript":
+        print("\nFor JavaScript/Electron version:")
+        print("- Requires Node.js 16+ (install via Homebrew: brew install node)")
+        print("- You can also use: npm run dist to create .dmg installer")
+    else:
+        print("\nFor Python version:")
+        print("- Requires Python 3.6+ with tkinter")
+    
     print(f"\nAlternatively, run directly: {launcher_path}")
 
 def main():
+    version = detect_version()
+    
     print("🧮 Hisab Calculator - Desktop Setup Utility")
     print("=" * 50)
+    print(f"Detected version: {version.upper()}")
+    
+    if version == "unknown":
+        print("❌ Could not detect Hisab Calculator version!")
+        print("Make sure you're running this script from the Hisab directory.")
+        return
     
     system = platform.system().lower()
     
@@ -119,7 +173,13 @@ def main():
     print("Setup complete! You can now:")
     print("• Find Hisab Calculator in your applications menu")
     print("• Use desktop shortcuts (if created)")
-    print("• Run directly: python3 hisab_app.py")
+    
+    if version == "javascript":
+        print("• Run directly: npm start (after npm install && npm run build)")
+        print("• Development mode: npm run dev")
+    else:
+        print("• Run directly: python3 hisab_app.py")
+    
     print("\nFor troubleshooting, see README.md")
 
 if __name__ == "__main__":

@@ -1,28 +1,48 @@
 @echo off
-REM Hisab Desktop Application Launcher for Windows
+REM Hisab Calculator - Windows Launcher Script
+REM Builds and runs the Electron application
 
-echo Starting Hisab Desktop Application...
+echo 🧮 Starting Hisab Calculator...
 
-REM Check if Python 3 is installed
-python --version >nul 2>&1
+REM Check if Node.js is installed
+where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo Error: Python is not installed or not in PATH!
-    echo Please install Python 3 from https://python.org
-    echo Make sure to check "Add Python to PATH" during installation
+    echo ❌ Node.js is not installed. Please install Node.js from https://nodejs.org/
     pause
     exit /b 1
 )
 
-REM Check if tkinter is available
-python -c "import tkinter" >nul 2>&1
+REM Check if npm is installed
+where npm >nul 2>nul
 if %errorlevel% neq 0 (
-    echo Error: tkinter is not available!
-    echo tkinter should be included with Python on Windows
-    echo Please reinstall Python from https://python.org
+    echo ❌ npm is not installed. Please install npm
     pause
     exit /b 1
 )
 
-REM Run the application
-python hisab_app.py
+echo 📦 Checking dependencies...
+
+REM Check if node_modules exists
+if not exist "node_modules" (
+    echo 📥 Installing dependencies...
+    call npm install
+    if %errorlevel% neq 0 (
+        echo ❌ Failed to install dependencies
+        pause
+        exit /b 1
+    )
+)
+
+echo 🔨 Building React app...
+call npm run build
+if %errorlevel% neq 0 (
+    echo ❌ Failed to build React app
+    pause
+    exit /b 1
+)
+
+echo 🚀 Starting Hisab Calculator...
+call npm start
+
+echo ✅ Hisab Calculator closed successfully
 pause
